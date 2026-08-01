@@ -1,0 +1,38 @@
+{
+  "dev": {
+    "account": "REPLACE_WITH_DEV_ACCOUNT_ID",
+    "region": "us-east-1",
+    "environment": "dev",
+    "removal_policy": "DESTROY",
+    "tags": {
+      "Environment": "dev",
+      "Project": "kavach-dq-framework",
+      "Team": "data-quality",
+      "CostCenter": "REPLACE"
+    }
+  },
+  "beta": {
+    "account": "REPLACE_WITH_BETA_ACCOUNT_ID",
+    "region": "us-east-1",
+    "environment": "beta",
+    "removal_policy": "RETAIN",
+    "tags": {
+      "Environment": "beta",
+      "Project": "kavach-dq-framework",
+      "Team": "data-quality",
+      "CostCenter": "REPLACE"
+    }
+  },
+  "prod": {
+    "account": "REPLACE_WITH_PROD_ACCOUNT_ID",
+    "region": "us-east-1",
+    "environment": "prod",
+    "removal_policy": "RETAIN",
+    "tags": {
+      "Environment": "prod",
+      "Project": "kavach-dq-framework",
+      "Team": "data-quality",
+      "CostCenter": "REPLACE"
+    }
+  }
+}
