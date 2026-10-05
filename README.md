@@ -79,3 +79,37 @@ part of the future Lambda/agent stacks. Invalid schemas raise `TypeError` or `Va
 
 Run the unit tests locally with `python -m pytest tests/unit` after installing the
 development dependencies.
+
+## Scoring and Response Payloads
+
+The executor helpers compute weighted pass percentages and build response payloads
+without AWS access. Each evaluated rule supplies a unique `rule_id`, a `dimension`,
+a boolean `passed`, and a `severity` (`CRITICAL`, `WARNING`, or `INFO`). Optional
+`weight` defaults to 1 and must be finite and positive.
+
+```python
+from kavach.lambdas.rule_executor.result_writer import build_response
+
+response = build_response("orders", [
+    {"rule_id": "id_unique", "dimension": "uniqueness",
+     "passed": True, "severity": "CRITICAL", "weight": 3},
+    {"rule_id": "email_present", "dimension": "completeness",
+     "passed": False, "severity": "WARNING",
+     "expected": "< 2% missing", "actual": "5.3% missing"},
+])
+assert response["dq_score"] == 75.0
+assert response["status"] == "ALERT"
+```
+
+The score is `100 * passing weight / total weight`, rounded to two decimal places,
+both overall and per dimension. Any failed critical rule produces `FAIL`; other
+failures produce `ALERT`; all passing rules produce `PASS`. Status depends on
+failures, not on the rounded score. Empty results, duplicate rule IDs, and malformed
+evaluations raise errors instead of returning a misleading passing result.
+
+`score_computer.handler` accepts a direct event containing `results`. The response
+builder includes UTC `timestamp`, rule counts, dimension scores, and copied failure
+details. Pass an aware `executed_at` datetime to retain the original execution time
+across retries. Persistence, query execution, and deployment wiring remain future
+work. GitHub Actions runs unit tests on Python 3.11 and 3.13 and lints the core
+package and tests on pull requests and pushes to `main`.
